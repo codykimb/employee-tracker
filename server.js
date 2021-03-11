@@ -39,7 +39,7 @@ function startPrompt() {
             case "View All Employees?":
                 viewAllEmployees();
                 break;
-            case "View All Employee's By Roles??":
+            case "View All Employee's By Roles?":
                 viewByRoles();
                 break;
             case "View all Employees By Departments":
@@ -66,4 +66,26 @@ function viewAllEmployees() {
       console.table(res)
       startPrompt()
   })
-}
+    }
+
+// VIEW EMPLOYEES BY ROLES
+function viewByRoles() {
+    connection.query("SELECT employees.first_name AS First_Name, employees.last_name AS Last_Name, roles.title AS Title FROM employees JOIN roles ON employees.role_id = roles.id;", 
+    function(err, res) {
+    if (err) throw err
+    console.table(res)
+    startPrompt()
+    })
+  }
+// VIEW EMPLOYEES BY DEPARTMENTS
+function viewByDept() {
+    connection.query("SELECT employees.first_name AS First_Name, employees.last_name AS Last_Name, departments.name AS Department FROM employees JOIN roles ON employees.role_id = roles.id JOIN departments ON roles.department_id = departments.id ORDER BY employees.id;", 
+    function(err, res) {
+      if (err) throw err
+      console.table(res)
+      startPrompt()
+    })
+  }
+
+//
+
