@@ -25,9 +25,11 @@ function startPrompt() {
         message: "What would you like to do?",
         name: "selection",
         choices: [
-            "View All Employees?", 
-            "View All Employee's By Roles",
-            "View all Employees By Departments", 
+            "View All Departments",
+            "View All Roles",
+            "View All Employees", 
+            "View All Employees By Role",
+            "View all Employees By Department", 
             "Update Employee",
             "Add Employee",
             "Add Role",
@@ -36,30 +38,56 @@ function startPrompt() {
         }
     ]).then(function(choice) {
         switch(choice.selection) {
-            case "View All Employees?":
+            case "View All Departments":
+                viewAllDept();
+                break;
+            case "View All Roles":
+                viewAllRoles();
+                break;
+            case "View All Employees":
                 viewAllEmployees();
                 break;
-            case "View All Employee's By Roles":
+            case "View All Employees By Role":
                 viewByRoles();
                 break;
-            case "View all Employees By Departments":
+            case "View all Employees By Department":
                 viewByDept();
-                break;
-            case "Update Employee":
-                updateEmployee();
-                break;
-            case "Add Employee":
-                addEmployee();
-                break;
-            case "Add Role":
-                addRole();
                 break;
             case "Add Department":
                 addDept();
                 break;
+            case "Add Role":
+                addRole();
+                break;
+            case "Add Employee":
+                addEmployee();
+                break;
+            case "Update Employee Role":
+                updateEmployee();
+                break;
         }
     })
 }
+
+// VIEW ALL DEPARTMENTS
+function viewAllDept() {
+    connection.query("SELECT departments.id AS Dept_ID, departments.name AS Department_Name FROM departments;",  
+    function(err, res) {
+      if (err) throw err
+      console.table(res)
+      startPrompt()
+  })
+    }
+
+// VIEW ALL ROLES
+function viewAllRoles() {
+    connection.query("SELECT roles.id AS Role_ID, roles.title As Job_Title, roles.salary as Salary, departments.name AS Department FROM roles INNER JOIN departments on departments.id = roles.department_id;",  
+    function(err, res) {
+      if (err) throw err
+      console.table(res)
+      startPrompt()
+  })
+    }
 
 // VIEW ALL EMPLOYEES
 function viewAllEmployees() {
@@ -71,7 +99,7 @@ function viewAllEmployees() {
   })
     }
 
-// VIEW EMPLOYEES BY ROLES
+// VIEW EMPLOYEES BY ROLE
 function viewByRoles() {
     connection.query("SELECT employees.first_name AS First_Name, employees.last_name AS Last_Name, roles.title AS Title FROM employees JOIN roles ON employees.role_id = roles.id;", 
     function(err, res) {
@@ -80,7 +108,7 @@ function viewByRoles() {
     startPrompt()
     })
   }
-// VIEW EMPLOYEES BY DEPARTMENTS
+// VIEW EMPLOYEES BY DEPARTMENT
 function viewByDept() {
     connection.query("SELECT employees.first_name AS First_Name, employees.last_name AS Last_Name, departments.name AS Department FROM employees JOIN roles ON employees.role_id = roles.id JOIN departments ON roles.department_id = departments.id ORDER BY employees.id;", 
     function(err, res) {
