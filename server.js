@@ -144,6 +144,19 @@ function selectManager() {
     return managersArray;
 }
 
+// SELECT DEPARTMENTS
+var deptArray = []
+function selectDept() {
+    connection.query("SELECT * FROM departments",
+    function(err, res) {
+        if (err) throw err
+        for (i=0; i < res.length; i++) {
+            deptArray.push(res[i].name);
+        }
+    })
+    return deptArray;
+}
+
 // ADD EMPLOYEE
 function addEmployee() {
     inquirer.prompt([
@@ -187,3 +200,39 @@ function addEmployee() {
     })
 }
 
+// ADD EMPLOYEE ROLE
+function addRole() { 
+      inquirer.prompt([
+          {
+            name: "roletitle",
+            type: "input",
+            message: "What is the roles Title?"
+          },
+          {
+            name: "rolesalary",
+            type: "input",
+            message: "What is the Salary?"
+          },
+          {
+            name: "roledept",
+            type: "list",
+            message: "What is the Department?",
+            choices: selectDept()
+          } 
+      ]).then(function(choice) {
+        var deptId = selectDept().indexOf(choice.roledept) + 1
+          connection.query(
+              "INSERT INTO roles SET ?",
+              {
+                title: choice.roletitle,
+                salary: choice.rolesalary,
+                department_id: deptId
+              },
+              function(err) {
+                  if (err) throw err
+                  console.table(choice);
+                  startPrompt();
+              }
+          )
+      });
+    }
