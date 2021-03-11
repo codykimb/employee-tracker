@@ -1,8 +1,9 @@
+// DEPENDENCIES
 const inquirer = require("inquirer")
-const mysql = require("mysql")
+const mysql2 = require("mysql2")
 const cTable = require('console.table');
 
-const connection = mysql.createConnection({
+const connection = mysql2.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
@@ -16,6 +17,7 @@ connection.connect(err => {
     startPrompt();
   });
 
+// INQUIRER
 function startPrompt() {
     inquirer.prompt([
         {
@@ -56,3 +58,12 @@ function startPrompt() {
     })
 }
 
+//VIEW ALL EMPLOYEES
+function viewAllEmployees() {
+    connection.query("SELECT employees.first_name AS First_Name, employees.last_name AS Last_Name, roles.title AS Title, roles.salary as Salary, departments.name as Dept_Name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employees INNER JOIN roles on roles.id = employees.role_id INNER JOIN departments on departments.id = roles.department_id LEFT JOIN employees e on employees.manager_id = e.id;",  
+    function(err, res) {
+      if (err) throw err
+      console.table(res)
+      startPrompt()
+  })
+}
