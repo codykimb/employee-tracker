@@ -30,10 +30,10 @@ function startPrompt() {
             "View All Employees", 
             "View All Employees By Role",
             "View all Employees By Department", 
-            "Update Employee",
-            "Add Employee",
+            "Add Department",
             "Add Role",
-            "Add Department"
+            "Add Employee",
+            "Update Employee Role",
             ]
         }
     ]).then(function(choice) {
@@ -91,7 +91,7 @@ function viewAllRoles() {
 
 // VIEW ALL EMPLOYEES
 function viewAllEmployees() {
-    connection.query("SELECT employees.first_name AS First_Name, employees.last_name AS Last_Name, roles.title AS Title, roles.salary as Salary, departments.name as Dept_Name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employees INNER JOIN roles on roles.id = employees.role_id INNER JOIN departments on departments.id = roles.department_id LEFT JOIN employees e on employees.manager_id = e.id;",  
+    connection.query("SELECT employees.id AS ID, employees.first_name AS First_Name, employees.last_name AS Last_Name, roles.title AS Job_Title, roles.salary as Salary, departments.name as Department, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employees INNER JOIN roles on roles.id = employees.role_id INNER JOIN departments on departments.id = roles.department_id LEFT JOIN employees e on employees.manager_id = e.id;",  
     function(err, res) {
       if (err) throw err
       console.table(res)
@@ -118,6 +118,18 @@ function viewByDept() {
     })
   }
 
+// SELECT EMPLOYEE
+var employeesArray = [];
+function selectEmployee() {
+    connection.query("SELECT * FROM employees",
+    function(err, res) {
+        if (err) throw err
+        for (i=0; i < res.length; i++) {
+            employeesArray.push(res[i].first_name + " " + res[i].last_name);
+        }
+    })
+    return employeesArray;
+}
 // SELECT ROLE
 var rolesArray = [];
 function selectRole() {
@@ -182,25 +194,25 @@ function addEmployee() {
             message: "Who is employee's manager? ",
             choices: selectManager()
         },
-    ]).then(function(choice) {
-        var roleId = selectRole().indexOf(choice.role) + 1
-        var managerId = selectManager().indexOf(choice.manager) + 1
+    ]).then(function(res) {
+        var roleId = selectRole().indexOf(res.role) + 1
+        var managerId = selectManager().indexOf(res.manager) + 1
         connection.query("INSERT INTO employees SET ?",
         {
-            first_name: choice.firstname,
-            last_name: choice.lastname,
+            first_name: res.firstname,
+            last_name: res.lastname,
             manager_id: managerId,
             role_id: roleId
         }, function(err) {
             if (err) throw err
-            console.table(choice)
+            console.table(res)
             startPrompt()
         }
         )
     })
 }
 
-// ADD EMPLOYEE ROLE
+// ADD ROLE
 function addRole() { 
       inquirer.prompt([
           {
@@ -219,18 +231,18 @@ function addRole() {
             message: "What is the Department?",
             choices: selectDept()
           } 
-      ]).then(function(choice) {
-        var deptId = selectDept().indexOf(choice.roledept) + 1
+      ]).then(function(res) {
+        var deptId = selectDept().indexOf(res.roledept) + 1
           connection.query(
               "INSERT INTO roles SET ?",
               {
-                title: choice.roletitle,
-                salary: choice.rolesalary,
+                title: res.roletitle,
+                salary: res.rolesalary,
                 department_id: deptId
               },
               function(err) {
                   if (err) throw err
-                  console.table(choice);
+                  console.table(res);
                   startPrompt();
               }
           )
@@ -246,18 +258,60 @@ function addDept() {
           type: "input",
           message: "What Department would you like to add?"
         }
-    ]).then(function(choice) {
-        var query = connection.query(
+    ]).then(function(res) {
+        connection.query(
             "INSERT INTO departments SET ? ",
             {
-              name: choice.name
-            
+              name: res.name
             },
             function(err) {
                 if (err) throw err
-                console.table(choice);
+                console.table(res);
                 startPrompt();
             }
         )
     })
   }
+
+// UPDATE EMPLOYEE ROLE
+
+function updateEmployee() {
+    inquirer.prompt([
+        {
+            name: "sure",
+            type: "confirm",
+            message: "Are you sure?"
+        },
+        {
+            name: "name",
+            type: "list",
+            message: "Which employee would you like to update? ",
+            choices: selectEmployee()
+        },
+        {
+            name: "role",
+            type: "list",
+            message: "What is the Employees new role? ",
+            choices: selectRole()
+          }
+    ]).then(function(res) {
+        var roleId = selectRole().indexOf(res.role) + 1
+        var eId = selectEmployee().indexOf(res.name) + 1
+        console.log(roleId)
+        console.log(eId)
+        connection.query(
+            "UPDATE employees SET ? WHERE ?",
+            {
+                role_id: roleId 
+            },
+            {
+                id: eId
+            }, 
+            function(err) {
+                if (err) throw err
+                console.table(res);
+                startPrompt();
+            }
+        )
+    })
+}
