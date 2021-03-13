@@ -19,6 +19,7 @@ connection.connect(err => {
 
 // INQUIRER
 function startPrompt() {
+    selectEmployee();
     inquirer.prompt([
         {
         type: "list",
@@ -127,6 +128,7 @@ function selectEmployee() {
         for (i=0; i < res.length; i++) {
             employeesArray.push(res[i].first_name + " " + res[i].last_name);
         }
+        
     })
     return employeesArray;
 }
@@ -274,19 +276,13 @@ function addDept() {
   }
 
 // UPDATE EMPLOYEE ROLE
-
 function updateEmployee() {
     inquirer.prompt([
-        {
-            name: "sure",
-            type: "confirm",
-            message: "Are you sure?"
-        },
         {
             name: "name",
             type: "list",
             message: "Which employee would you like to update? ",
-            choices: selectEmployee()
+            choices: employeesArray
         },
         {
             name: "role",
@@ -301,12 +297,12 @@ function updateEmployee() {
         console.log(eId)
         connection.query(
             "UPDATE employees SET ? WHERE ?",
-            {
+            [{
                 role_id: roleId 
             },
             {
                 id: eId
-            }, 
+            }], 
             function(err) {
                 if (err) throw err
                 console.table(res);
