@@ -220,17 +220,17 @@ function addRole() {
           {
             name: "roletitle",
             type: "input",
-            message: "What is the roles Title?"
+            message: "What is the role title?"
           },
           {
             name: "rolesalary",
             type: "input",
-            message: "What is the Salary?"
+            message: "What is the role salary?"
           },
           {
             name: "roledept",
             type: "list",
-            message: "What is the Department?",
+            message: "What is the role department?",
             choices: selectDept()
           } 
       ]).then(function(res) {
@@ -258,7 +258,7 @@ function addDept() {
         {
           name: "name",
           type: "input",
-          message: "What Department would you like to add?"
+          message: "What department would you like to add?"
         }
     ]).then(function(res) {
         connection.query(
@@ -287,7 +287,7 @@ function updateEmployee() {
         {
             name: "role",
             type: "list",
-            message: "What is the Employees new role? ",
+            message: "What is the employee's new role? ",
             choices: selectRole()
           }
     ]).then(function(res) {
