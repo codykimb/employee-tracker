@@ -198,7 +198,7 @@ function addEmployee() {
         },
     ]).then(function(res) {
         var roleId = selectRole().indexOf(res.role) + 1
-        var managerId = selectManager().indexOf(res.manager) + 1
+        var managerId = selectManager().indexOf(res.manager) + 2
         connection.query("INSERT INTO employees SET ?",
         {
             first_name: res.firstname,
@@ -293,6 +293,7 @@ function updateEmployee() {
     ]).then(function(res) {
         var roleId = selectRole().indexOf(res.role) + 1
         var eId = selectEmployee().indexOf(res.name) + 1
+        console.log(res)
         console.log(roleId)
         console.log(eId)
         connection.query(
